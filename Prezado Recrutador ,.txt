@@ -1,0 +1,65 @@
+import csv
+
+def calcular_orcamento(tipo, quartos=1, garagem=False, vagas_estudio=0, possui_criancas=True):
+    if tipo == "apartamento":
+        valor_base = 700
+        if quartos == 2:
+            valor_base += 200
+        if garagem:
+            valor_base += 300
+        if not possui_criancas:
+            valor_base *= 0.95
+
+    elif tipo == "casa":
+        valor_base = 900
+        if quartos == 2:
+            valor_base += 250
+        if garagem:
+            valor_base += 300
+
+    elif tipo == "estudio":
+        valor_base = 1200
+        if vagas_estudio >= 2:
+            valor_base += 250
+            if vagas_estudio > 2:
+                valor_base += (vagas_estudio - 2) * 60
+    else:
+        raise ValueError("Tipo de imóvel inválido")
+
+    contrato_total = 2000
+    contrato_parcela = contrato_total / 5
+    valor_mensal = valor_base + contrato_parcela
+    return valor_mensal
+
+
+def gerar_csv(valor_mensal, nome_arquivo="orcamento.csv"):
+    with open(nome_arquivo, mode="w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Mês", "Valor Mensal"])
+        for mes in range(1, 13):
+            writer.writerow([mes, f"R$ {valor_mensal:.2f}"])
+    print(f"Arquivo '{nome_arquivo}' gerado com sucesso!")
+
+
+# Programa interativo
+print("=== Sistema de Orçamento R.M Imobiliária ===")
+tipo = input("Digite o tipo de imóvel (apartamento/casa/estudio): ").strip().lower()
+
+quartos = 1
+garagem = False
+vagas_estudio = 0
+possui_criancas = True
+
+if tipo in ["apartamento", "casa"]:
+    quartos = int(input("Número de quartos (1 ou 2): "))
+    garagem = input("Deseja garagem? (s/n): ").strip().lower() == "s"
+    if tipo == "apartamento":
+        possui_criancas = input("Possui crianças? (s/n): ").strip().lower() == "s"
+
+elif tipo == "estudio":
+    vagas_estudio = int(input("Quantas vagas de estacionamento deseja? "))
+
+valor = calcular_orcamento(tipo, quartos, garagem, vagas_estudio, possui_criancas)
+print(f"\nValor mensal do orçamento: R$ {valor:.2f}")
+
+gerar_csv(valor)
